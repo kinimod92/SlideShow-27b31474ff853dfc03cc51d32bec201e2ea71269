@@ -22,7 +22,7 @@
 	#include <wx/wxprec.h>
 #endif
 
-//Do not add custom headers between 
+//Do not add custom headers between
 //Header Include Start and Header Include End.
 //wxDev-C++ designer will remove them. Add custom headers after the block.
 ////Header Include Start
@@ -35,9 +35,9 @@
 #define PokazFrm_STYLE wxCAPTION | wxSYSTEM_MENU | wxMINIMIZE_BOX | wxCLOSE_BOX
 ////Dialog Style End
 
-#include "libgfl.h" 
+#include "libgfl.h"
 #include "libgfle.h"
-#include "SlideImage.h" 
+#include "SlideImage.h"
 #include <wx/image.h>
 #include <wx/dcbuffer.h>
 #include <wx/filefn.h>
@@ -46,26 +46,28 @@
 #include <vector>
 #include <wx/utils.h>
 #include <wx/graphics.h>
-/*#if wxUSE_GRAPHICS_CONTEXT == 0 
-  #error wxGraphicsContext not available 
-#endif */
+#include <wx/thread.h>
+//#include "DrawThread.h"
+/*#if wxUSE_GRAPHICS_CONTEXT == 0
+  #error wxGraphicsContext not available
+#endif*/
+
 
 //#include "BackgroundPanel.h"
 using namespace std;
-class PokazFrm : public wxFrame {
+wxDECLARE_EVENT(myEVT_THREAD_UPDATE, wxThreadEvent);
+class PokazFrm : public wxFrame, public wxThreadHelper {
     private:
         // zmienne s³u¿¹ce do rysowania
         wxClientDC *client;
-        
         wxBufferedDC *dc;
-        //wxGraphicsContext *dc1;
-        
-        // nazwa obrazka bêd¹cego t³em    
+        // nazwa obrazka bêd¹cego t³em
         std::string BGName;
-        // obrazek bêd¹cy t³em   
-        wxImage background; 
+        // obrazek bêd¹cy t³em
+        wxImage background;
         // bitmapa biblioteki gfl
         GFL_BITMAP *bitmapGfl;
+        int w, h;
         // zmienne biblioteki gfl slu¿¹ce do wczytania obrazów
         GFL_LOAD_PARAMS load_option;
         GFL_FILE_INFORMATION file_info;
@@ -74,9 +76,8 @@ class PokazFrm : public wxFrame {
         vector<ImageConfiguration> configurations;
         // vector przechowuj¹cy wyswietlane obrazki
         vector<SlideImage> images;
-        
         void OnClose(wxCloseEvent& event);
-		void CreateGUIControls(); 
+		void CreateGUIControls();
 		// wczytanie obrazu przy pomocy biblioteki gfl
 		bool gflLoadImage(string fileName);
         // funkcja ustawia t³o
@@ -93,8 +94,11 @@ class PokazFrm : public wxFrame {
 		void loadImages();
 		// funkcja rysuje obrazki
         void drawImages();
+        //poki co do niczego nie sluzy, ale moze sie przyda
+        void OnThreadUpdate(wxThreadEvent& evt);
+        
 		DECLARE_EVENT_TABLE();
-		
+
 	public:
 		PokazFrm(wxWindow *parent, wxWindowID id = 1, const wxString &title = wxT("PokazSlajdow"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = PokazFrm_STYLE);
 		virtual ~PokazFrm();
@@ -103,8 +107,7 @@ class PokazFrm : public wxFrame {
 		void PokazFrmPaint(wxPaintEvent& event);
 		//po wcisnieciu ESC wywoluje sie i zamyka program
 		void Exit(wxKeyEvent& event);
-		void BGPanelUpdateUI(wxUpdateUIEvent& event);
-		
+
 	private:
 		//Do not add custom control declarations between
 		//GUI Control Declaration Start and GUI Control Declaration End.
@@ -113,7 +116,7 @@ class PokazFrm : public wxFrame {
 		wxPanel *BGPanel;
 		wxBoxSizer *WxBoxSizer1;
 		////GUI Control Declaration End
-		
+
 	private:
 		//Note: if you receive any error with these enum IDs, then you need to
 		//change your old form code that are based on the #define control IDs.
@@ -126,9 +129,13 @@ class PokazFrm : public wxFrame {
 			////GUI Enum Control ID End
 			ID_DUMMY_VALUE_ //don't remove this value unless you have other enum values
 		};
-		
-	private:
-		
+
+	protected:
+        virtual wxThread::ExitCode Entry();
+
+
+
 };
+
 
 #endif

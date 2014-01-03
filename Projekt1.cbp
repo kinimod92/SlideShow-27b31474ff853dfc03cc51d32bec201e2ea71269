@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SlideShow" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="default">
+				<Option output="Projekt1" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+			</Target>
+		</Build>
+		<Unit filename="PokazFrm.cpp" />
+		<Unit filename="PokazFrm.h" />
+		<Unit filename="PokazFrm.wxform" />
+		<Unit filename="Projekt1App.cpp" />
+		<Unit filename="Projekt1App.h" />
+		<Unit filename="Projekt1App.rc">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

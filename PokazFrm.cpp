@@ -22,16 +22,14 @@
 //----------------------------------------------------------------------------
 //Add Custom Events only in the appropriate block.
 //Code added in other places will be removed by wxDev-C++
+wxDEFINE_EVENT(myEVT_THREAD_UPDATE, wxThreadEvent);
 ////Event Table Start
 BEGIN_EVENT_TABLE(PokazFrm,wxFrame)
 	////Manual Code Start
-	//EVT_CHAR(PokazFrm::Exit)
+	EVT_THREAD(myEVT_THREAD_UPDATE, PokazFrm::OnThreadUpdate)
 	////Manual Code End
-	
 	EVT_CLOSE(PokazFrm::OnClose)
 	EVT_PAINT(PokazFrm::PokazFrmPaint)
-	
-	EVT_UPDATE_UI(ID_WXPANEL1,PokazFrm::BGPanelUpdateUI)
 END_EVENT_TABLE()
 ////Event Table End
 
@@ -57,7 +55,7 @@ void PokazFrm::CreateGUIControls() {
 	this->SetSizer(WxBoxSizer1);
 	this->SetAutoLayout(true);
 
-	BGPanel = new wxPanel(this, ID_WXPANEL1, wxPoint(0, 0), wxSize(441, 311));
+	BGPanel = new wxPanel(this, ID_WXPANEL1, wxPoint(0, 0), wxSize(1024, 768));
 	WxBoxSizer1->Add(BGPanel, 1, wxALIGN_CENTER | wxEXPAND | wxALL, 0);
 
 	SetTitle(_("PokazSlajdow"));
@@ -72,7 +70,6 @@ void PokazFrm::CreateGUIControls() {
 	this->client = new wxClientDC(BGPanel);
     this->dc = new wxBufferedDC();
     
-    
 	ReadCfg();
 	setBackground();
 	//drawBackground();
@@ -80,21 +77,23 @@ void PokazFrm::CreateGUIControls() {
 	
 	BGPanel->SetFocus();
 	BGPanel->Bind(wxEVT_KEY_UP, &PokazFrm::Exit, this);
-	BGPanel->Bind(wxEVT_LEFT_UP, &PokazFrm::FullScreen, this); //EVT_DLEFT_CLICK
+	//BGPanel->Bind(wxEVT_LEFT_UP, &PokazFrm::FullScreen, this); //EVT_DLEFT_CLICK
 	this->Show();
 	this->ShowFullScreen(TRUE);
+
+    drawImages();
 }
 
 void PokazFrm::OnClose(wxCloseEvent& event) {
+    /*if (GetThread() &&      
+        GetThread()->IsRunning())
+        GetThread()->Wait();*/
 	Destroy();
 }
 
 void PokazFrm::FullScreen(wxMouseEvent& event) {
 	this->ShowFullScreen(!this->IsFullScreen());
-	//client = new wxClientDC(BGPanel);
-    //dc = new wxBufferedDC(client);
-    //dc = wxGraphicsContext::Create( bdc );
-	drawBackground();
+	//drawBackground();
 }
 
 bool PokazFrm::gflLoadImage(string fileName) {
@@ -138,12 +137,14 @@ void PokazFrm::drawBackground() {
 
 void PokazFrm::PokazFrmPaint(wxPaintEvent& event) {
 	drawBackground();
-	drawImages();
+	//drawImages();
 }
 
 void PokazFrm::Exit(wxKeyEvent& event) {
     if (event.GetKeyCode() == 27)
 	   Destroy();
+	if (event.GetKeyCode() == WXK_F11)
+	  this->ShowFullScreen(!this->IsFullScreen());
 }
 
 void PokazFrm::ReadCfg() {
@@ -153,10 +154,6 @@ void PokazFrm::ReadCfg() {
         getline(file, BGName);
         file.close();
     } else wxMessageBox("Nie mozna odczytac pliku konfiguracyjnego");
-}
-
-void PokazFrm::BGPanelUpdateUI(wxUpdateUIEvent& event) {
-    //drawBackground();
 }
 
 void PokazFrm::test(string str, bool clearFile ) const {
@@ -190,9 +187,31 @@ void PokazFrm::loadImages() {
     }    
 }
 
-void PokazFrm::drawImages() {
+
+void PokazFrm::drawImages()
+{
+    // we want to start a long task, but we don't want our GUI to block
+    // while it's executed, so we use a thread to do it.
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError("Could not create the worker thread!");
+        return;
+    }
+    // go!
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError("Could not run the worker thread!");
+        return;
+    }
+}
+
+wxThread::ExitCode PokazFrm::Entry() //rysowanie
+{
+    while (!GetThread()->TestDestroy())
+    {
     int x = 50;
-    int w, h;
+   
+    int i=0;
     BGPanel->GetSize(&w, &h);
     for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 250) {
         for(int i = 0;  i <= 600 ; i += 2) {
@@ -206,4 +225,15 @@ void PokazFrm::drawImages() {
             wxMilliSleep(5);
         }
     }
+        // VERY IMPORTANT: do not call any GUI function inside this
+        //                 function; rather use wxQueueEvent():
+       wxQueueEvent(this, new wxThreadEvent(myEVT_THREAD_UPDATE));
+    }
+    return (wxThread::ExitCode)0;
+}
+
+void PokazFrm::OnThreadUpdate(wxThreadEvent& evt)
+{
+    // ...do something... e.g. m_pGauge->Pulse();
+    // read some parts of m_data just for fun:
 }

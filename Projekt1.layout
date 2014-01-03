@@ -1,65 +1,59 @@
-[Editors]
-Focused=5
-Order=0,1,2,3,4,5
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="default" />
+	<File name="PokazFrm.h" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="384" topLine="36" />
+		</Cursor>
+	</File>
+	<File name="PokazFrm.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="0" />
+		</Cursor>
+	</File>
+</CodeBlocks_layout_file>
 [Editor_0]
-Open=1
-Top=0
-CursorCol=25
-CursorRow=18
+CursorCol=1
+CursorRow=11
 TopLine=11
 LeftChar=1
 [Editor_1]
-Open=1
-Top=0
 CursorCol=18
 CursorRow=23
-TopLine=7
+TopLine=1
 LeftChar=1
 [Editor_2]
-Open=1
-Top=0
 CursorCol=1
 CursorRow=1
 TopLine=1
 LeftChar=1
 [Editor_3]
-Open=1
-Top=0
-CursorCol=30
-CursorRow=51
-TopLine=42
+CursorCol=25
+CursorRow=48
+TopLine=37
 LeftChar=1
 [Editor_4]
-Open=1
-Top=0
-CursorCol=1
-CursorRow=10
-TopLine=1
+CursorCol=33
+CursorRow=34
+TopLine=191
 LeftChar=1
 [Editor_5]
-Open=1
-Top=1
 CursorCol=1
 CursorRow=1
 TopLine=1
 LeftChar=1
-[Editor_6]
-CursorCol=13
-CursorRow=11
-TopLine=1
-LeftChar=1
-[Editor_7]
-CursorCol=1
-CursorRow=5
-TopLine=1
-LeftChar=1
 [Editor_8]
-CursorCol=38
-CursorRow=13
+CursorCol=11
+CursorRow=16
+TopLine=1
+LeftChar=1
+[Editor_6]
+CursorCol=1
+CursorRow=2
 TopLine=1
 LeftChar=1
 [Editor_9]
 CursorCol=1
 CursorRow=2
-TopLine=1
+TopLine=4
 LeftChar=1
