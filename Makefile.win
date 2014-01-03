@@ -1,0 +1,52 @@
+# Project: SlideShow
+# Compiler: Default GCC compiler
+# Compiler Type: MingW 3
+# Makefile created by wxDev-C++ IDE 7.4.2.569 on 03-01-14 17:52
+
+WXLIBNAME = wxmsw29u
+CPP       = g++.exe
+CC        = gcc.exe
+WINDRES   = "windres.exe"
+OBJ       = Objects/MingW/Projekt1App.o Objects/MingW/PokazFrm.o Objects/MingW/ImageConfiguration.o Objects/MingW/SlideImage.o Objects/MingW/Projekt1_private.res
+LINKOBJ   = "Objects/MingW/Projekt1App.o" "Objects/MingW/PokazFrm.o" "Objects/MingW/ImageConfiguration.o" "Objects/MingW/SlideImage.o" Objects/MingW/Projekt1_private.res
+LIBS      = -L"C:/Program Files (x86)/Dev-Cpp/lib/wx/gcc_lib" -L"C:/Program Files (x86)/Dev-Cpp/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW32/lib" -mwindows -l$(WXLIBNAME) -l$(WXLIBNAME)_gl -lwxscintilla -lwxtiff -lwxjpeg -lwxpng -lwxzlib -lwxregexu -lwxexpat -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lole32 -loleaut32 -luuid -lrpcrt4 -ladvapi32 -lwsock32 -lodbc32 -lopengl32 libgfl.a libgfle.a  
+INCS      = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include"
+CXXINCS   = -I"C:/Program Files (x86)/Dev-Cpp/MinGW32/include" -I"C:/Program Files (x86)/Dev-Cpp/" -I"C:/Program Files (x86)/Dev-Cpp/include/common"
+RCINCS    = --include-dir "C:/PROGRA~2/Dev-Cpp/include/common"
+BIN       = Output/MingW/Projekt1.exe
+DEFINES   = -D__WXMSW__ -D__GNUWIN32__ -D_UNICODE
+CXXFLAGS  = $(CXXINCS) $(DEFINES)  
+CFLAGS    = $(INCS) $(DEFINES)  
+GPROF     = gprof.exe
+ifeq ($(OS),Windows_NT)
+   RM = del /Q
+   FixPath = $(subst /,\,$1)
+else
+   RM = rm -f
+   FixPath = $1
+endif
+LINK      = g++.exe
+
+.PHONY: all all-before all-after clean clean-custom
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	$(RM) $(call FixPath,$(LINKOBJ)) "$(call FixPath,$(BIN))"
+
+$(BIN): $(OBJ)
+	$(LINK) $(LINKOBJ) -o "$(BIN)" $(LIBS) 
+
+Objects/MingW/Projekt1App.o: $(GLOBALDEPS) Projekt1App.cpp Projekt1App.h PokazFrm.h libgfl.h libgfle.h libgfl.h SlideImage.h ImageConfiguration.h
+	$(CPP) -c Projekt1App.cpp -o Objects/MingW/Projekt1App.o $(CXXFLAGS)
+
+Objects/MingW/PokazFrm.o: $(GLOBALDEPS) PokazFrm.cpp PokazFrm.h libgfl.h libgfle.h libgfl.h SlideImage.h ImageConfiguration.h
+	$(CPP) -c PokazFrm.cpp -o Objects/MingW/PokazFrm.o $(CXXFLAGS)
+
+Objects/MingW/ImageConfiguration.o: $(GLOBALDEPS) ImageConfiguration.cpp ImageConfiguration.h
+	$(CPP) -c ImageConfiguration.cpp -o Objects/MingW/ImageConfiguration.o $(CXXFLAGS)
+
+Objects/MingW/SlideImage.o: $(GLOBALDEPS) SlideImage.cpp SlideImage.h ImageConfiguration.h
+	$(CPP) -c SlideImage.cpp -o Objects/MingW/SlideImage.o $(CXXFLAGS)
+
+Objects/MingW/Projekt1_private.res: Objects/MingW/Projekt1_private.rc Projekt1App.rc 
+	$(WINDRES) --input-format=rc -o Objects/MingW/Projekt1_private.res $(RCINCS) Objects/MingW/PROJEK~1.RC -O coff
