@@ -1,4 +1,5 @@
 #include <iostream>
+#include <wx/gdicmn.h>
 using namespace std;
 /**
 * klasa przechowuj¹ca informacje o pozycji, rozmiarze i k¹cie obrotu wyœwietlanego obrazka
@@ -11,9 +12,12 @@ class ImageConfiguration {
         // wysokoœæ obrazka
         int height;
         // po³o¿enie x œrodka obrazka
-        int xMiddle;
+        //int xMiddle;
         // po³o¿enie y œrodka obrazka
-        int yMiddle;
+        //int yMiddle;
+        wxPoint imgPlace;
         // k¹t obrotu obrazka
-        int angle;    
+        int angle;
+    public:
+        ImageConfiguration(int w,int h, wxPoint place, int ang);
 };

@@ -10,9 +10,9 @@ using namespace std;
 class SlideImage : public wxImage {
     private:
            // zmienna okreœlaj¹ca obecnoœæ ramki wokó³ obrazka
-           bool isPolaroidFrame;
+           //bool isPolaroidFrame;
            // kolor ramki
-           wxColour polaroidFrameColor;
+           //static wxColour polaroidFrameColor;
            // zmienna okreœlaj¹ca obecnoœæ opisu wyœwietlanego na ramce
            bool isDescription;
            // opis 

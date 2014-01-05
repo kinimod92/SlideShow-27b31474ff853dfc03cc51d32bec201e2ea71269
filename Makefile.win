@@ -1,7 +1,7 @@
 # Project: SlideShow
 # Compiler: Default GCC compiler
 # Compiler Type: MingW 3
-# Makefile created by wxDev-C++ IDE 7.4.2.569 on 04-01-14 00:51
+# Makefile created by wxDev-C++ IDE 7.4.2.569 on 05-01-14 00:50
 
 WXLIBNAME = wxmsw29u
 CPP       = g++.exe

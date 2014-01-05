@@ -67,9 +67,11 @@ void PokazFrm::CreateGUIControls() {
 	Center();
 	
 	////GUI Items Creation End
+	
+	int w,h;
 	this->client = new wxClientDC(BGPanel);
     this->dc = new wxBufferedDC();
-    
+
 	ReadCfg();
 	setBackground();
 	//drawBackground();
@@ -120,7 +122,9 @@ void PokazFrm::gflToWx(GFL_BITMAP *bitmap, wxImage &img) {
             gflGetColorAt(bitmap, i, j, &c);
             img.SetRGB(i, j, c.Red, c.Green, c.Blue);
         }
+    //img.Rotate(3, wxPoint(0,0));
     }
+    
 }
 
 void PokazFrm::drawBackground() {
@@ -131,7 +135,8 @@ void PokazFrm::drawBackground() {
     
     dc->Clear();
     BGPanel->GetSize(&w, &h);
-    client->DrawBitmap( wxBitmap(background.Scale(w,h)), 0, 0, true );
+    client->SetDeviceOrigin(w/2,h/2);
+    client->DrawBitmap( wxBitmap(background.Scale(w,h)), -(w)/2,-(h)/2, true );
     dc->Blit(0, 0, w, h, client, -(w)/2,-(h)/2);
 }
 
@@ -149,11 +154,52 @@ void PokazFrm::Exit(wxKeyEvent& event) {
 
 void PokazFrm::ReadCfg() {
     std::fstream file;
+    string desc,rgb,params;
+    int RGB[3];
     file.open( "config.txt", std::ios::in | std::ios::out );
     if(file.good() == true ) {
+        getline(file, desc);
         getline(file, BGName);
+        getline(file, desc);
+        getline(file, desc);
+        getline(file, rgb);
+        if(rgb!=""){
+            isPolaroidFrame=true;
+            stringstream stream(rgb);
+            for(int i=0;i<3;i++) {
+                stream >> RGB[i];
+                if(!stream)
+                    break;
+            }
+            polaroidColor.Set(RGB[0],RGB[1],RGB[2]);
+        }
+        else
+            isPolaroidFrame=false;
+        getline(file,desc);
+        file>>animType; //getline(file,animType);
+        getline(file,desc);
+        getline(file,desc);
+        file>>showInterval; //getline(file,showInterval);
+        getline(file,desc);
+        getline(file,desc);
+        while(getline(file,params))
+            ReadParams(params);
         file.close();
     } else wxMessageBox("Nie mozna odczytac pliku konfiguracyjnego");
+    //wxMessageBox(wxString::Format(wxT("%i"),showInterval));
+}
+
+void PokazFrm::ReadParams(string params)
+{
+    int config[5];
+    stringstream stream(params);
+    for(int i=0;i<5;i++) {
+        stream >> config[i];
+        if(!stream)
+            break;
+    }
+    configurations.push_back(ImageConfiguration(config[0],config[1],wxPoint(config[2],config[3]),config[4]));
+    //wxMessageBox(wxString::Format(wxT("%i"),config[4]));
 }
 
 void PokazFrm::test(string str, bool clearFile ) const {
@@ -216,8 +262,12 @@ wxThread::ExitCode PokazFrm::Entry() //rysowanie
     for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 250) {
         for(int i = 0;  i <= 600 ; i += 2) {
             dc->Clear();
-            client->DrawBitmap( wxBitmap(background.Scale(w,h)), 0, 0, true );
-            client->DrawRectangle(30+i, 230, 340,380);
+            client->DrawBitmap( wxBitmap(background.Scale(w,h)), -(w)/2,-(h)/2, true );
+            if(isPolaroidFrame)
+            {
+                client->SetBrush(wxBrush(polaroidColor));
+                client->DrawRectangle(30+i, 230, 340,380);
+            }
             client->DrawBitmap( wxBitmap( (*it).Scale(300,300)), 50+i, 250, true );
             dc->Blit(0, 0, w, h, client, 0, 0, wxCOPY );
             //Sleep(5);

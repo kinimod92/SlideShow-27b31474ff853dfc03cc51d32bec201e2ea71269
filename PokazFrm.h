@@ -44,6 +44,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <sstream>
 #include <wx/utils.h>
 #include <wx/graphics.h>
 #include <wx/thread.h>
@@ -65,6 +66,14 @@ class PokazFrm : public wxFrame, public wxThreadHelper {
         std::string BGName;
         // obrazek bêd¹cy t³em
         wxImage background;
+        // zmienna okreœlaj¹ca obecnoœæ ramki wokó³ obrazka
+        bool isPolaroidFrame;
+        // kolor ramki
+        wxColour polaroidColor;
+        // typ animacji
+        int animType;
+        // czas pomiedzy kolejnymi zdjeciami
+        int showInterval;
         // bitmapa biblioteki gfl
         GFL_BITMAP *bitmapGfl;
         int w, h;
@@ -88,6 +97,7 @@ class PokazFrm : public wxFrame, public wxThreadHelper {
 		void drawBackground();
 		//odczytuje dane z pliku konfiguracyjnego
 		void ReadCfg();
+		void ReadParams(string params);
 		// funkcja slu¿¹ca do testow, zapisuje str do pliku, jeœli drugi arg jest true to czysci plik, domyœlnie dopisuje na koniec pliku
 		void test(string str, bool clearFile = false ) const;
 		// funkcja wczytuje do programu obrazy z katologu Output/MingW
