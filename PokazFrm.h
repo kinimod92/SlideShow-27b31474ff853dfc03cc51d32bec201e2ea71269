@@ -44,6 +44,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <stdlib.h> 
 #include <sstream>
 #include <wx/utils.h>
 #include <wx/graphics.h>
@@ -60,8 +61,8 @@ wxDECLARE_EVENT(myEVT_THREAD_UPDATE, wxThreadEvent);
 class PokazFrm : public wxFrame, public wxThreadHelper {
     private:
         // zmienne s³u¿¹ce do rysowania
-        wxClientDC *client;
-        wxBufferedDC *dc;
+       // wxClientDC client;
+      //  wxBufferedDC dc;
         // nazwa obrazka bêd¹cego t³em
         std::string BGName;
         // obrazek bêd¹cy t³em
