@@ -8,7 +8,7 @@ using namespace std;
 * @author Marcin Niesciur
 */
 class SlideImage : public wxImage {
-    private:
+    public:
            // zmienna okreœlaj¹ca obecnoœæ ramki wokó³ obrazka
            //bool isPolaroidFrame;
            // kolor ramki

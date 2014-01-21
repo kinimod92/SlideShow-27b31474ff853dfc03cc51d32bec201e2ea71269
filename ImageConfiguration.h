@@ -6,7 +6,7 @@ using namespace std;
 * @author Marcin Niesciur
 */
 class ImageConfiguration {
-    private:
+    public:
         // szerokoœæ obrazka
         int width;
         // wysokoœæ obrazka
@@ -20,4 +20,6 @@ class ImageConfiguration {
         int angle;
     public:
         ImageConfiguration(int w,int h, wxPoint place, int ang);
+        ImageConfiguration();
+        ImageConfiguration& operator=(const ImageConfiguration& img);
 };

@@ -67,14 +67,9 @@ void PokazFrm::CreateGUIControls() {
 	Center();
 	
 	////GUI Items Creation End
-	
-	int w,h;
-	this->client = new wxClientDC(BGPanel);
-    this->dc = new wxBufferedDC();
-
+    
 	ReadCfg();
 	setBackground();
-	//drawBackground();
 	loadImages();
 	
 	BGPanel->SetFocus();
@@ -82,7 +77,9 @@ void PokazFrm::CreateGUIControls() {
 	//BGPanel->Bind(wxEVT_LEFT_UP, &PokazFrm::FullScreen, this); //EVT_DLEFT_CLICK
 	this->Show();
 	this->ShowFullScreen(TRUE);
-
+	
+    //BGPanel->GetSize(&w, &h);
+    //client->SetDeviceOrigin(w/2,h/2);
     drawImages();
 }
 
@@ -127,22 +124,9 @@ void PokazFrm::gflToWx(GFL_BITMAP *bitmap, wxImage &img) {
     
 }
 
-void PokazFrm::drawBackground() {
-    if (!background.Ok()) 
-        return;
-    //dc->Init(client, BGPanel->GetSize());
-    int w, h;
-    
-    dc->Clear();
-    BGPanel->GetSize(&w, &h);
-    client->SetDeviceOrigin(w/2,h/2);
-    client->DrawBitmap( wxBitmap(background.Scale(w,h)), -(w)/2,-(h)/2, true );
-    dc->Blit(0, 0, w, h, client, -(w)/2,-(h)/2);
-}
-
 void PokazFrm::PokazFrmPaint(wxPaintEvent& event) {
-	drawBackground();
-	//drawImages();
+    //drawBackground();
+    //drawImages();
 }
 
 void PokazFrm::Exit(wxKeyEvent& event) {
@@ -185,12 +169,13 @@ void PokazFrm::ReadCfg() {
         while(getline(file,params))
             ReadParams(params);
         file.close();
-    } else wxMessageBox("Nie mozna odczytac pliku konfiguracyjnego");
+    } 
+    else 
+        wxMessageBox("Nie mozna odczytac pliku konfiguracyjnego");
     //wxMessageBox(wxString::Format(wxT("%i"),showInterval));
 }
 
-void PokazFrm::ReadParams(string params)
-{
+void PokazFrm::ReadParams(string params) {
     int config[5];
     stringstream stream(params);
     for(int i=0;i<5;i++) {
@@ -233,57 +218,89 @@ void PokazFrm::loadImages() {
     }    
 }
 
+void PokazFrm::drawBackground() {
+    if (!background.Ok()) 
+        return;
+    //dc->Clear();
+    /*
+    stringstream ss;
+    ss << w;
+    string str = ss.str();
+    test(str,true);
+     ss << h;
+    str = ss.str();
+    test(str);
+    */ 
+    wxClientDC c(BGPanel);
+    wxBufferedDC b(&c);
+    int w,h;
+    BGPanel->GetSize(&w, &h);
+  // client->DrawBitmap( wxBitmap(background.Scale(w,h)), -(w)/2,-(h)/2, true );
+    b.DrawBitmap( wxBitmap(background.Scale(w,h)), 0,0, true );
+    //c.Blit(0, 0, w, h, &b, 0, 0);
+}
 
-void PokazFrm::drawImages()
-{
+void PokazFrm::drawImages() {
     // we want to start a long task, but we don't want our GUI to block
     // while it's executed, so we use a thread to do it.
-    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
-    {
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR) {
         wxLogError("Could not create the worker thread!");
         return;
     }
     // go!
-    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
-    {
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR) {
         wxLogError("Could not run the worker thread!");
         return;
     }
 }
-
-wxThread::ExitCode PokazFrm::Entry() //rysowanie
-{
-    while (!GetThread()->TestDestroy())
-    {
-    int x = 50;
-   
-    int i=0;
-    BGPanel->GetSize(&w, &h);
-    for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 250) {
-        for(int i = 0;  i <= 600 ; i += 2) {
-            dc->Clear();
-            client->DrawBitmap( wxBitmap(background.Scale(w,h)), -(w)/2,-(h)/2, true );
-            if(isPolaroidFrame)
-            {
-                client->SetBrush(wxBrush(polaroidColor));
-                client->DrawRectangle(30+i, 230, 340,380);
+//rysowanie
+wxThread::ExitCode PokazFrm::Entry() {
+    while (!GetThread()->TestDestroy()) {
+            int x = 50;
+            wxClientDC client(BGPanel);
+            wxBufferedDC buffered(&client);
+            int w,h;
+            BGPanel->GetSize(&w, &h);
+            wxBitmap bitmap(background.Scale(w,h));
+            int random, size;
+            ImageConfiguration randConfiguration;
+            for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 350) {
+                    if(animType == 1) {
+                        it->Rescale(300, 300);
+                        it->SetMaskColour(0,0,255);  
+                        double r = 0;
+                        for(int i = 50; i <= 400; i += 4) {
+                            buffered.DrawBitmap( bitmap, 0,0, true );
+                            //wxImage im = it->Rotate( i, wxPoint(150,150) );
+                            buffered.DrawBitmap( wxBitmap( (*it).Rotate(r, wxPoint(it->GetWidth()/2,it->GetHeight()/2)) ),100 +x, 50+i, true );
+                            client.Blit(0, 0, w, h, &buffered, 0, 0, wxCOPY );
+                            //wxMilliSleep(1000);
+                            r += 0.1;
+                        }
+                        bitmap = wxBitmap( buffered.GetAsBitmap().ConvertToImage().Scale(w,h) );
+                    }
+                    else if(animType == 2) {               
+                         size = configurations.size(); 
+                         random =  rand() % size;
+                         randConfiguration  = configurations[random];
+                         wxImage temp = it->Scale( randConfiguration.width, randConfiguration.height );
+                         it->SetMaskColour(0,0,255);  
+                         for(int i = 0; i <= randConfiguration.imgPlace.y; i += 4) {
+                            buffered.DrawBitmap( bitmap, 0,0, true );
+                            buffered.DrawBitmap( wxBitmap( (temp) ), randConfiguration.imgPlace.x, i, true );
+                            client.Blit(0, 0, w, h, &buffered, 0, 0, wxCOPY );
+                            wxMilliSleep(4);
+                         }
+                         bitmap = wxBitmap( buffered.GetAsBitmap().ConvertToImage().Scale(w,h) );
+                    }    
             }
-            client->DrawBitmap( wxBitmap( (*it).Scale(300,300)), 50+i, 250, true );
-            dc->Blit(0, 0, w, h, client, 0, 0, wxCOPY );
-            //Sleep(5);
-            
-            wxMilliSleep(5);
-        }
-    }
-        // VERY IMPORTANT: do not call any GUI function inside this
-        //                 function; rather use wxQueueEvent():
-       wxQueueEvent(this, new wxThreadEvent(myEVT_THREAD_UPDATE));
+      
+        wxQueueEvent(this, new wxThreadEvent(myEVT_THREAD_UPDATE));
     }
     return (wxThread::ExitCode)0;
 }
 
-void PokazFrm::OnThreadUpdate(wxThreadEvent& evt)
-{
+void PokazFrm::OnThreadUpdate(wxThreadEvent& evt) {
     // ...do something... e.g. m_pGauge->Pulse();
     // read some parts of m_data just for fun:
 }
