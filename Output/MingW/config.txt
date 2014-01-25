@@ -1,10 +1,9 @@
 1.Nazwê pliku graficznego, który pos³u¿y jako t³o do pokazu:
 colourful-afternoon.jpg
-
 2.Kolor ramki w RGB(zostawiæ puste w przypadku braku)
 45 125 189
 3.Rodzaj animacji(1 lub 2)
-2
+1
 4.Czas pomiêdzy kolejnymi przejœciami(sekundy)
 1
 5.Parametry zdjecia : width height x y angle

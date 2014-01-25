@@ -144,7 +144,7 @@ void PokazFrm::ReadCfg() {
     if(file.good() == true ) {
         getline(file, desc);
         getline(file, BGName);
-        getline(file, desc);
+        //getline(file, desc);
         getline(file, desc);
         getline(file, rgb);
         if(rgb!=""){
@@ -257,6 +257,8 @@ void PokazFrm::drawImages() {
 wxThread::ExitCode PokazFrm::Entry() {
     while (!GetThread()->TestDestroy()) {
             int x = 50;
+            int y = 0;
+            int i=0;
             wxClientDC client(BGPanel);
             wxBufferedDC buffered(&client);
             int w,h;
@@ -264,7 +266,8 @@ wxThread::ExitCode PokazFrm::Entry() {
             wxBitmap bitmap(background.Scale(w,h));
             int random, size;
             ImageConfiguration randConfiguration;
-            for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 350) {
+            int kolejna_linia=1;
+            for (std::vector<SlideImage>::iterator it = images.begin(); it != images.end(); ++it,  x += 320, kolejna_linia++) {
                     if(animType == 1) {
                         it->Rescale(300, 300);
                         it->SetMaskColour(0,0,255);  
@@ -272,21 +275,42 @@ wxThread::ExitCode PokazFrm::Entry() {
                         for(int i = 50; i <= 400; i += 4) {
                             buffered.DrawBitmap( bitmap, 0,0, true );
                             //wxImage im = it->Rotate( i, wxPoint(150,150) );
-                            buffered.DrawBitmap( wxBitmap( (*it).Rotate(r, wxPoint(it->GetWidth()/2,it->GetHeight()/2)) ),100 +x, 50+i, true );
+                            buffered.DrawBitmap( wxBitmap( (*it).Rotate(r, wxPoint(it->GetWidth()/2,it->GetHeight()/2)) ),-40+x, -400+i+y, true );
                             client.Blit(0, 0, w, h, &buffered, 0, 0, wxCOPY );
                             //wxMilliSleep(1000);
-                            r += 0.1;
+                            r += double(rand() % 1000)/7000.0;
+                            //r += 0.08;
                         }
                         bitmap = wxBitmap( buffered.GetAsBitmap().ConvertToImage().Scale(w,h) );
+                        if(kolejna_linia!=0 && kolejna_linia%4==0)
+                        {
+                            y+=220;
+                            x=50-320;
+                        }
+                        if(kolejna_linia==3*4)
+                        {
+                            kolejna_linia=0;
+                            y=0;
+                            x=50-320;
+                        }
                     }
                     else if(animType == 2) {               
                          size = configurations.size(); 
-                         random =  rand() % size;
-                         randConfiguration  = configurations[random];
+                         //random =  rand() % size;
+                         randConfiguration  = configurations[i];
+                         if(i<size-1)
+                            i++;
+                         else
+                            i=0;
                          wxImage temp = it->Scale( randConfiguration.width, randConfiguration.height );
                          it->SetMaskColour(0,0,255);  
                          for(int i = 0; i <= randConfiguration.imgPlace.y; i += 4) {
                             buffered.DrawBitmap( bitmap, 0,0, true );
+                            if(isPolaroidFrame)
+                            {
+                                buffered.SetBrush(wxBrush(polaroidColor));
+                                buffered.DrawRectangle(randConfiguration.imgPlace.x-20, i-20, randConfiguration.width+40, randConfiguration.height+70);
+                            }
                             buffered.DrawBitmap( wxBitmap( (temp) ), randConfiguration.imgPlace.x, i, true );
                             client.Blit(0, 0, w, h, &buffered, 0, 0, wxCOPY );
                             wxMilliSleep(4);
